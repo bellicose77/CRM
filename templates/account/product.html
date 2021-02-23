@@ -18,8 +18,17 @@
 							<th>Category</th>
 							<th>Price</th>
 						</tr>
+                        {% for it in items %}
+                        <tr>
+                         <td>{{ it.name }}</td>
+                            <td>{{ it.price }}</td>
+                          <td>  {{ it.category }}</td>
+                        </tr>
+                        {% endfor %}
 
 					</table>
+
+
 				</div>
 			</div>
 
