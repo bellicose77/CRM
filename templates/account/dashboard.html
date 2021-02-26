@@ -22,6 +22,8 @@
 				</tr>
                 {% for cus in customers %}
                 <tr>
+                <td><a class="btn btn-sm btn-info" href="{% url 'customer' cus.id %}">View</a></td>
+
                     <td>{{ cus.name }}</td>
                     <td>{{ cus.phone }}</td>
                 </tr>
