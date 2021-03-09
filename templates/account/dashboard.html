@@ -38,7 +38,7 @@
 		<h5>LAST 5 ORDERS</h5>
 		<hr>
 		<div class="card card-body">
-			<a class="btn btn-primary  btn-sm btn-block" href="">Create Order</a>
+			<a class="btn btn-primary  btn-sm btn-block" href="{% url 'order' %}">Create Order</a>
 			<table class="table table-sm">
 				<tr>
 					<th>Product</th>
@@ -52,8 +52,8 @@
                     <td>{{ oo.product }}</td>
                       <td>{{ oo.date_created }}</td>
                       <td>{{oo.status }}</td>
-                    <td><a href="#">Update</a></td>
-                      <td><a href="#">Delete</a></td>
+                     <td><a href="{% url 'order_update' oo.id %}" class="btn btn-success">Update</a></td>
+                      <td><a href="{% url 'order_delete' oo.id %}" class="btn btn-danger">Delete</a></td>
                 </tr>
                 {% endfor %}
 			</table>

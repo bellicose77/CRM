@@ -1,5 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.http import HttpResponse
+from .forms import OrderForm
 from .models import Customer,Product,Order,Tag
 
 # Create your views here.
@@ -26,3 +27,33 @@ def customer(request,pk):
     context={'cus':customers,'orders':orders,'tot':tot_orders}
 
     return render(request,'account/customer.html',context)
+def Order_page(request):
+    form=OrderForm()
+    if request.method=='POST':
+        form=OrderForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(home)
+
+    context={'form':form}
+    return render(request,'account/order_form.html',context)
+
+def order_update(request,pk):
+    froms=Order.objects.get(id=pk)
+    form=OrderForm(instance=froms)
+
+    if request.method == 'POST':
+        form = OrderForm(request.POST,)
+        if form.is_valid():
+            form.save()
+            return redirect(home)
+    context = {'form':form}
+    return render(request, 'account/order_form.html', context)
+
+def delete_order(request,pk):
+    order=Order.objects.get(id=pk)
+    if request.method=="POST":
+        order.delete()
+        return redirect(home)
+    context={"items":order}
+    return render(request,'account/delete.html',context)
