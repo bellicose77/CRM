@@ -1,59 +1,78 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .forms import OrderForm
-from .models import Customer,Product,Order,Tag
-
+from django.forms import inlineformset_factory
 # Create your views here.
-def home(request):
-    customers=Customer.objects.all()
-    orders=Order.objects.all()
-    delever=Order.objects.filter(status='Delivered').count()
-    total_orders=Order.objects.count()
-    pending=Order.objects.filter(status='Pending').count()
+from .models import *
+from .forms import OrderForm
 
-    context={'customers':customers,'orders':orders,'total_orders':total_orders,'delever':delever,'pending':pending}
-    return render(request,'account/dashboard.html',context)
+
+
+def home(request):
+	orders = Order.objects.all()
+	customers = Customer.objects.all()
+
+	total_customers = customers.count()
+
+	total_orders = orders.count()
+	delivered = orders.filter(status='Delivered').count()
+	pending = orders.filter(status='Pending').count()
+
+	context = {'orders':orders, 'customers':customers,
+	'total_orders':total_orders,'delivered':delivered,
+	'pending':pending }
+
+	return render(request, 'account/dashboard.html', context)
 
 def products(request):
-    items=Product.objects.all()
-    context={'items':items}
+	products = Product.objects.all()
 
-    return render(request,'account/product.html',context)
+	return render(request, 'account/product.html', {'products':products})
 
-def customer(request,pk):
-    customers=Customer.objects.get(id=pk)
-    orders=customers.order_set.all()
-    tot_orders=Order.objects.count()
-    context={'cus':customers,'orders':orders,'tot':tot_orders}
+def customer(request, pk_test):
+	customer = Customer.objects.get(id=pk_test)
 
-    return render(request,'account/customer.html',context)
-def Order_page(request):
-    form=OrderForm()
-    if request.method=='POST':
-        form=OrderForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect(home)
+	orders = customer.order_set.all()
+	order_count = orders.count()
 
-    context={'form':form}
-    return render(request,'account/order_form.html',context)
+	context = {'customer':customer, 'orders':orders, 'order_count':order_count}
+	return render(request, 'account/customer.html',context)
 
-def order_update(request,pk):
-    froms=Order.objects.get(id=pk)
-    form=OrderForm(instance=froms)
 
-    if request.method == 'POST':
-        form = OrderForm(request.POST,)
-        if form.is_valid():
-            form.save()
-            return redirect(home)
-    context = {'form':form}
-    return render(request, 'account/order_form.html', context)
+def createOrder(request, pk):
+	OrderFormSet = inlineformset_factory(Customer, Order, fields=('product', 'status'), extra=10 )
+	customer = Customer.objects.get(id=pk)
+	formset = OrderFormSet(queryset=Order.objects.none(),instance=customer)
+	#form = OrderForm(initial={'customer':customer})
+	if request.method == 'POST':
+		#print('Printing POST:', request.POST)
+		#form = OrderForm(request.POST)
+		formset = OrderFormSet(request.POST, instance=customer)
+		if formset.is_valid():
+			formset.save()
+			return redirect('/')
 
-def delete_order(request,pk):
-    order=Order.objects.get(id=pk)
-    if request.method=="POST":
-        order.delete()
-        return redirect(home)
-    context={"items":order}
-    return render(request,'account/delete.html',context)
+	context = {'form':formset}
+	return render(request, 'account/order_form.html', context)
+
+def updateOrder(request, pk):
+
+	order = Order.objects.get(id=pk)
+	form = OrderForm(instance=order)
+
+	if request.method == 'POST':
+		form = OrderForm(request.POST, instance=order)
+		if form.is_valid():
+			form.save()
+			return redirect('/')
+
+	context = {'form':form}
+	return render(request, 'account/order_form.html', context)
+
+def deleteOrder(request, pk):
+	order = Order.objects.get(id=pk)
+	if request.method == "POST":
+		order.delete()
+		return redirect('/')
+
+	context = {'item':order}
+	return render(request, 'account/delete.html', context)

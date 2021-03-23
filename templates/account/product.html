@@ -1,7 +1,5 @@
-{% extends 'base.html' %}
-{% block title %}
-    Product
-{% endblock %}
+{%  extends 'base.html' %}
+
 {% block content %}
 
 		<br>
@@ -18,17 +16,16 @@
 							<th>Category</th>
 							<th>Price</th>
 						</tr>
-                        {% for it in items %}
-                        <tr>
-                         <td>{{ it.name }}</td>
-                            <td>{{ it.price }}</td>
-                          <td>  {{ it.category }}</td>
-                        </tr>
-                        {% endfor %}
+
+						{% for i in products %}
+							<tr>
+								<td>{{i.name}}</td>
+								<td>{{i.category}}</td>
+								<td>{{i.price}}</td>
+							</tr>
+						{% endfor %}
 
 					</table>
-
-
 				</div>
 			</div>
 
