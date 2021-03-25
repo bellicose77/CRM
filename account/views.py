@@ -1,12 +1,43 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.forms import inlineformset_factory
+from django.contrib.auth import authenticate,login,logout
 # Create your views here.
 from .models import *
-from .forms import OrderForm
+from .forms import OrderForm,CreateUserform
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
+
+def register(request):
+	form=CreateUserform()
+	if request.method=='POST':
+		form =CreateUserform(request.POST)
+		if form.is_valid():
+			form.save()
+			return redirect('login')
+
+	context={'form':form}
+	return render(request,'account/register.html',context)
+
+def loginpage(request):
+	if request.method=='POST':
+		username=request.POST.get('username')
+		password=request.POST.get('password')
+
+		user=authenticate(username=username,password=password)
+
+		if user is not None:
+			login(request,user)
+			return redirect('home')
+
+	context={}
+	return render(request,'account/login.html',context)
+def logoutpage(request):
+	logout(request)
+	return redirect('login')
 
 
-
+@login_required(login_url='login')
 def home(request):
 	orders = Order.objects.all()
 	customers = Customer.objects.all()
@@ -23,6 +54,7 @@ def home(request):
 
 	return render(request, 'account/dashboard.html', context)
 
+@login_required(login_url='login')
 def products(request):
 	products = Product.objects.all()
 
