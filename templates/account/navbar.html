@@ -21,7 +21,12 @@
       <li class="nav-item">
         <a class="nav-link" href="{% url 'products' %}">Products</a>
       </li>
-        {% endif %}
+        {% else %}
+       <li class="nav-item">
+        <a class="nav-link" href="{% url 'account' %}">Settings</a>
+      </li>
+      {% endif %}
+
     </ul>
   </div>
     <span class="hello-msg">{{ request.user }}</span>
